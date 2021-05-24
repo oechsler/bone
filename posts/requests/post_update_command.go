@@ -3,17 +3,18 @@ package requests
 import (
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
+	"github.com/oechsler/bone/posts/adapter"
 	"github.com/oechsler/bone/posts/data"
 	"github.com/oechsler/bone/posts/repositories"
 )
 
 type PostUpdateCommand struct {
-	data.PostUpdateDto `validate:"required"`
+	adapter.PostUpdateAdapter `validate:"required"`
 }
 
-func NewPostUpdateCommand(dto data.PostUpdateDto) *PostUpdateCommand {
+func NewPostUpdateCommand(updateAdapter adapter.PostUpdateAdapter) *PostUpdateCommand {
 	command := new(PostUpdateCommand)
-	command.PostUpdateDto = dto
+	command.PostUpdateAdapter = updateAdapter
 
 	return command
 }
@@ -48,14 +49,14 @@ func (handler PostUpdateHandler) Send(command PostUpdateCommand) error {
 }
 
 func (handler PostUpdateHandler) handle(command PostUpdateCommand) error {
-	err := handler.PostRepository.Update(command.PostUpdateDto.Id, data.Post{
-		Title: command.PostUpdateDto.Title,
-		Content: command.PostUpdateDto.Content,
+	err := handler.PostRepository.Update(command.PostUpdateAdapter.Id, data.Post{
+		Title: command.PostUpdateAdapter.Title,
+		Content: command.PostUpdateAdapter.Content,
 	})
 	if err != nil {
 		return err
 	}
 
-	handler.Logger.Print("Successfully updated post with id '%s'", command.PostUpdateDto.Id)
+	handler.Logger.Print("Successfully updated post with id '%s'", command.PostUpdateAdapter.Id)
 	return nil
 }

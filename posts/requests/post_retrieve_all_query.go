@@ -5,17 +5,18 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
+	"github.com/oechsler/bone/posts/adapter"
 	"github.com/oechsler/bone/posts/data"
 	"github.com/oechsler/bone/posts/repositories"
 )
 
 type PostRetrieveAllQuery struct {
-	data.PostRetrieveAllDto `validate:"required"`
+	adapter.PostRetrieveAllAdapter `validate:"required"`
 }
 
-func NewPostRetrieveAllQuery(dto data.PostRetrieveAllDto) *PostRetrieveAllQuery {
+func NewPostRetrieveAllQuery(retrieveAllAdapter adapter.PostRetrieveAllAdapter) *PostRetrieveAllQuery {
 	query := new(PostRetrieveAllQuery)
-	query.PostRetrieveAllDto = dto
+	query.PostRetrieveAllAdapter = retrieveAllAdapter
 
 	return query
 }
@@ -32,7 +33,7 @@ func NewPostRetrieveAllHandler(logger echo.Logger, postRepository repositories.P
 	}
 }
 
-func (handler PostRetrieveAllHandler) Send(query PostRetrieveAllQuery) ([]data.PostDto, error) {
+func (handler PostRetrieveAllHandler) Send(query PostRetrieveAllQuery) ([]adapter.PostAdapter, error) {
 	var err error
 
 	validate := validator.New()
@@ -49,18 +50,18 @@ func (handler PostRetrieveAllHandler) Send(query PostRetrieveAllQuery) ([]data.P
 	return result, nil
 }
 
-func (handler PostRetrieveAllHandler) handle(query PostRetrieveAllQuery) ([]data.PostDto, error) {
+func (handler PostRetrieveAllHandler) handle(query PostRetrieveAllQuery) ([]adapter.PostAdapter, error) {
 	result := handler.PostRepository.RetrieveAll(query.Skip, query.Take)
 
-	posts := make([]data.PostDto, 0, 0)
+	posts := make([]adapter.PostAdapter, 0, 0)
 	linq.From(result).
-	SelectT(func (post data.Post) data.PostDto {
+	SelectT(func (post data.Post) adapter.PostAdapter {
 		updatedAtHumanized := humanize.Time(post.UpdatedAt)
 		if post.UpdatedAt.IsZero() {
 			updatedAtHumanized = "never"
 		}
 
-		return data.PostDto{
+		return adapter.PostAdapter{
 			Id:        post.Id,
 			CreatedAt: humanize.Time(post.CreatedAt),
 			UpdatedAt: updatedAtHumanized,

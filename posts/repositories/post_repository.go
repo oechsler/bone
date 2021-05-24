@@ -7,5 +7,5 @@ type PostRepository interface {
 	RetrieveAll(skip int, take int) []data.Post
 	Retrieve(id string) (data.Post, error)
 	Update(id string, post data.Post) error
-	Delete(id string) bool
+	Delete(id string) error
 }

@@ -1,6 +1,6 @@
-package data
+package adapter
 
-type PostDto struct {
+type PostAdapter struct {
 	Id string `json:"id"`
 	CreatedAt string `json:"createdAt"`
 	UpdatedAt string `json:"updatedAt"`

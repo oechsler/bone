@@ -3,17 +3,18 @@ package requests
 import (
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
+	"github.com/oechsler/bone/posts/adapter"
 	"github.com/oechsler/bone/posts/data"
 	"github.com/oechsler/bone/posts/repositories"
 )
 
 type PostCreateCommand struct {
-	data.PostCreateDto `validate:"required"`
+	adapter.PostCreateAdapter `validate:"required"`
 }
 
-func NewPostCreateCommand(dto data.PostCreateDto) *PostCreateCommand {
+func NewPostCreateCommand(createAdapter adapter.PostCreateAdapter) *PostCreateCommand {
 	command := new(PostCreateCommand)
-	command.PostCreateDto = dto
+	command.PostCreateAdapter = createAdapter
 
 	return command
 }
@@ -49,8 +50,8 @@ func (handler PostCreateHandler) Send(command PostCreateCommand) error {
 
 func (handler PostCreateHandler) handle(command PostCreateCommand) error {
 	id, err := handler.PostRepository.Create(data.Post{
-		Title: command.PostCreateDto.Title,
-		Content: command.PostCreateDto.Content,
+		Title: command.PostCreateAdapter.Title,
+		Content: command.PostCreateAdapter.Content,
 	})
 	if err != nil {
 		return err

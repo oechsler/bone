@@ -27,7 +27,7 @@ func main() {
 	}
 
 	// Install modules
-	err = posts.UseModule(container);
+	err = posts.UseModule(container)
 	if err != nil {
 		server.Logger.Fatal(err)
 	}

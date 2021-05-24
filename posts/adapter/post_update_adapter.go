@@ -1,16 +1,16 @@
-package data
+package adapter
 
 import "gopkg.in/mcuadros/go-defaults.v1"
 
-type PostUpdateDto struct {
+type PostUpdateAdapter struct {
 	Id string `param:"id" validate:"uuid"`
 	Title string `json:"title"`
 	Content string `json:"content"`
 }
 
-func NewPostUpdateDto() *PostUpdateDto {
-	dto := new(PostUpdateDto)
-	defaults.SetDefaults(dto)
+func NewPostUpdateAdapter() *PostUpdateAdapter {
+	adapter := new(PostUpdateAdapter)
+	defaults.SetDefaults(adapter)
 
-	return dto
+	return adapter
 }

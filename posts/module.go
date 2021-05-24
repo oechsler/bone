@@ -32,6 +32,10 @@ func UseModule(container *dig.Container) error {
 	if err != nil {
 		return err
 	}
+	err = container.Provide(requests.NewPostDeleteHandler)
+	if err != nil {
+		return err
+	}
 
 	// Register endpoints
 	err = container.Invoke(endpoints.NewPostsEndpoint)

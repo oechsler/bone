@@ -80,24 +80,35 @@ func (repository PostRepositoryImpl) Retrieve(id string) (data.Post, error) {
 }
 
 func (repository *PostRepositoryImpl) Update(id string, post data.Post) error {
-	currentPost, err := repository.Retrieve(id)
+	postToUpdate, err := repository.Retrieve(id)
 	if err != nil {
 		return err
 	}
 
-	if currentPost.Title == post.Title &&
-	   currentPost.Content == post.Content {
+	if postToUpdate.Title == post.Title &&
+	   postToUpdate.Content == post.Content {
 		return echo.NewHTTPError(http.StatusBadRequest, "No changes have been made to the post.")
 	}
 
-	post.Id = currentPost.Id
-	post.CreatedAt = currentPost.CreatedAt
+	post.Id = postToUpdate.Id
+	post.CreatedAt = postToUpdate.CreatedAt
 	post.UpdatedAt = time.Now()
 
 	repository.posts = append(repository.posts, post)
 	return nil
 }
 
-func (repository PostRepositoryImpl) Delete(id string) bool {
-	panic("implement me")
+func (repository *PostRepositoryImpl) Delete(id string) error {
+	postToDelete, err := repository.Retrieve(id)
+	if err != nil {
+		return err
+	}
+
+	linq.From(repository.posts).
+	WhereT(func (post data.Post) bool {
+		return post.Id != postToDelete.Id
+	}).
+	ToSlice(&repository.posts)
+
+	return nil
 }

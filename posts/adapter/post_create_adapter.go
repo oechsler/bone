@@ -1,15 +1,15 @@
-package data
+package adapter
 
 import "gopkg.in/mcuadros/go-defaults.v1"
 
-type PostCreateDto struct {
+type PostCreateAdapter struct {
 	Title string `json:"title" validate:"required"`
 	Content string `json:"content" validate:"required"`
 }
 
-func NewPostCreateDto() *PostCreateDto {
-	dto := new(PostCreateDto)
-	defaults.SetDefaults(dto)
+func NewPostCreateAdapter() *PostCreateAdapter {
+	adapter := new(PostCreateAdapter)
+	defaults.SetDefaults(adapter)
 
-	return dto
+	return adapter
 }

@@ -2,7 +2,7 @@ package endpoints
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/oechsler/bone/posts/data"
+	"github.com/oechsler/bone/posts/adapter"
 	"github.com/oechsler/bone/posts/requests"
 	"go.uber.org/dig"
 	"net/http"
@@ -15,6 +15,7 @@ type PostsEndpoint struct {
 	requests.PostCreateHandler
 	requests.PostRetrieveAllHandler
 	requests.PostUpdateHandler
+	requests.PostDeleteHandler
 }
 
 func NewPostsEndpoint(echo *echo.Echo, endpoint PostsEndpoint) {
@@ -27,12 +28,12 @@ func NewPostsEndpoint(echo *echo.Echo, endpoint PostsEndpoint) {
 }
 
 func (endpoint PostsEndpoint) createPost(context echo.Context) error {
-	dto := data.NewPostCreateDto()
-	if err := (&echo.DefaultBinder{}).BindBody(context, dto); err != nil {
+	createAdapter := adapter.NewPostCreateAdapter()
+	if err := (&echo.DefaultBinder{}).BindBody(context, createAdapter); err != nil {
 		return err
 	}
 
-	command := requests.NewPostCreateCommand(*dto)
+	command := requests.NewPostCreateCommand(*createAdapter)
 	if err := endpoint.PostCreateHandler.Send(*command); err != nil {
 		return err
 	}
@@ -40,10 +41,10 @@ func (endpoint PostsEndpoint) createPost(context echo.Context) error {
 }
 
 func (endpoint PostsEndpoint) retrieveAllPosts(context echo.Context) error  {
-	dto := data.NewPostRetrieveAllDto()
-	_ = (&echo.DefaultBinder{}).BindQueryParams(context, dto)
+	retrieveAllAdapter := adapter.NewPostRetrieveAllAdapter()
+	_ = (&echo.DefaultBinder{}).BindQueryParams(context, retrieveAllAdapter)
 
-	query := requests.NewPostRetrieveAllQuery(*dto)
+	query := requests.NewPostRetrieveAllQuery(*retrieveAllAdapter)
 	result, err := endpoint.PostRetrieveAllHandler.Send(*query)
 	if err != nil {
 		return err
@@ -56,13 +57,13 @@ func (endpoint PostsEndpoint) retrievePost(context echo.Context) error {
 }
 
 func (endpoint PostsEndpoint) updatePost(context echo.Context) error {
-	dto := data.NewPostUpdateDto()
-	_ = (&echo.DefaultBinder{}).BindPathParams(context, dto)
-	if err := (&echo.DefaultBinder{}).BindBody(context, dto); err != nil {
+	updateAdapter := adapter.NewPostUpdateAdapter()
+	_ = (&echo.DefaultBinder{}).BindPathParams(context, updateAdapter)
+	if err := (&echo.DefaultBinder{}).BindBody(context, updateAdapter); err != nil {
 		return err
 	}
 
-	command := requests.NewPostUpdateCommand(*dto)
+	command := requests.NewPostUpdateCommand(*updateAdapter)
 	if err := endpoint.PostUpdateHandler.Send(*command); err != nil {
 		return err
 	}
@@ -70,5 +71,12 @@ func (endpoint PostsEndpoint) updatePost(context echo.Context) error {
 }
 
 func (endpoint PostsEndpoint) deletePost(context echo.Context) error {
-	panic("implement me")
+	deleteAdapter := adapter.NewPostDeleteAdapter()
+	_ = (&echo.DefaultBinder{}).BindPathParams(context, deleteAdapter)
+
+	command := requests.NewPostDeleteCommand(*deleteAdapter)
+	if err := endpoint.PostDeleteHandler.Send(*command); err != nil {
+		return err
+	}
+	return context.NoContent(http.StatusNoContent)
 }

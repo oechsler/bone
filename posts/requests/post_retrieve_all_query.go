@@ -71,6 +71,6 @@ func (handler PostRetrieveAllHandler) handle(query PostRetrieveAllQuery) ([]adap
 	}).
 	ToSlice(&posts)
 
-	handler.Logger.Printf("Successfully retrieved '%d/%d' requested posts.", len(posts), query.Take)
+	handler.Logger.Infof("Successfully retrieved '%d/%d' requested posts.", len(posts), query.Take)
 	return posts, nil
 }
